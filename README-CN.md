@@ -21,7 +21,7 @@
 - 多环境隔离（Dev、Staging、Prod）
 - 基于组件的模块化配置
 - 与阿里云 IacService 集成
-- GitHub Actions 和阿里云云效 的完整 CI/CD 方案
+- GitHub 和阿里云云效 的完整 CI/CD 方案
 
 ## 自动化服务台资源栈
 
@@ -83,8 +83,8 @@ alibabacloud-terraform-scaffold/
 │       └── ...
 ├── ci-templates/                   # VCS 集成模板目录
 │   ├── oss-mns-relay/             # OSS MNS 中转连接模式
-│   │   ├── github/                # GitHub Actions 集成方案
-│   │   │   ├── .github/workflows/ # GitHub Actions 工作流
+│   │   ├── github/                # GitHub 集成方案
+│   │   │   ├── .github/workflows/ # GitHub 工作流
 │   │   │   ├── bootstrap/         # 环境初始化配置
 │   │   │   └── scripts/           # CI/CD 辅助脚本
 │   │   └── alibaba-cloud-devops/         # 阿里云云效 集成方案
@@ -173,12 +173,14 @@ alibabacloud-terraform-scaffold/
 
 ## VCS 集成方案
 
+通过 VCS 集成，将基础设施即代码（IaC）的变更生命周期纳入既有的代码协作工作流，以 PR/MR 作为变更的准入门控，由自动化服务台承接 Terraform 的计划与执行，从而在不引入额外运维工具链的前提下实现基础设施变更的版本化、可审计与可追溯。
+
 本脚手架提供多种 VCS 集成方案的实现，按 **连接模式** 和 **VCS 平台** 两个维度组织：
 
 | 连接模式 | GitHub | 阿里云云效 |
 |---------|--------|------------|
 | **直连自动化服务台** | 🚧 规划中 | ✅ [查看文档](ci-templates/direct-iacservice/alibaba-cloud-devops/README-CN.md) |
-| **OSS MNS 中转** | ✅ [查看文档](ci-templates/oss-mns-relay/github/README-CN.md) | ✅ [查看文档](ci-templates/oss-mns-relay/alibaba-cloud-devops/README-CN.md) |
+| **OSS MNS 中转 (不推荐)** | ✅ [查看文档](ci-templates/oss-mns-relay/github/README-CN.md) | ✅ [查看文档](ci-templates/oss-mns-relay/alibaba-cloud-devops/README-CN.md) |
 
 
 

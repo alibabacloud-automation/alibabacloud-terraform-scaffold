@@ -21,7 +21,7 @@ This scaffold adopts a multi-environment management architecture, supporting:
 - Multi-environment isolation (Dev, Staging, Prod)
 - Component-based modular configuration
 - Integration with Alibaba Cloud IacService
-- Complete CI/CD solutions for GitHub Actions and Yunxiao
+- Complete CI/CD solutions for GitHub and Alibaba Cloud DevOps
 
 ## IacService Stack
 
@@ -83,8 +83,8 @@ alibabacloud-terraform-scaffold/
 │       └── ...
 ├── ci-templates/                   # VCS integration template directory
 │   ├── oss-mns-relay/             # OSS MNS relay connection mode
-│   │   ├── github/                # GitHub Actions integration
-│   │   │   ├── .github/workflows/ # GitHub Actions workflows
+│   │   ├── github/                # GitHub integration
+│   │   │   ├── .github/workflows/ # GitHub workflows
 │   │   │   ├── bootstrap/         # Environment initialization config
 │   │   │   └── scripts/           # CI/CD helper scripts
 │   │   └── alibaba-cloud-devops/         # Alibaba Cloud DevOps integration
@@ -104,7 +104,7 @@ alibabacloud-terraform-scaffold/
 
 **Note:** The repository is organized into two main parts:
 1. **Code Structure**: Includes core directories `modules/`, `components/`, `stacks/`, `deployments/`, defining Terraform modules, components, Stacks, and multi-environment deployment configurations
-2. **VCS Integration Examples**: The `ci-templates/` directory provides complete integration examples and templates for various version control systems (GitHub Actions, Alibaba Cloud DevOps, etc.)
+2. **VCS Integration Examples**: The `ci-templates/` directory provides complete integration examples and templates for various version control systems (GitHub, Alibaba Cloud DevOps, etc.)
 
 ## Core Concepts
 
@@ -173,12 +173,14 @@ Each environment directory contains:
 
 ## VCS Integration
 
+VCS integration embeds the IaC change lifecycle into existing code collaboration workflows, using PR/MR as the change gate while delegating Terraform plan and apply to IacService, achieving versioned, auditable, and traceable infrastructure changes without introducing additional operational toolchains.
+
 This scaffold provides multiple VCS integration implementations, organized by **connection mode** and **VCS platform**:
 
 | Connection Mode | GitHub | Alibaba Cloud DevOps |
 |----------------|--------|----------------|
 | **Direct IacService** | 🚧 Planned | ✅ [View Docs](ci-templates/direct-iacservice/alibaba-cloud-devops/README.md) |
-| **OSS MNS Relay** | ✅ [View Docs](ci-templates/oss-mns-relay/github/README.md) | ✅ [View Docs](ci-templates/oss-mns-relay/alibaba-cloud-devops/README.md) |
+| **OSS MNS Relay (Not Recommended)** | ✅ [View Docs](ci-templates/oss-mns-relay/github/README.md) | ✅ [View Docs](ci-templates/oss-mns-relay/alibaba-cloud-devops/README.md) |
 
 
 
@@ -204,11 +206,11 @@ A: A Stack is a template (class), while a Deployment is an instance (object). A 
 ### Q: How are sensitive credentials managed?
 A:
 - `profile.yaml` uses variable names (e.g., `DEV_ACCESS_KEY_ID`) as placeholders — no actual keys are stored
-- Actual AccessKeys are stored in the CI platform's encrypted variables (GitHub uses Secrets, Yunxiao uses pipeline variables)
+- Actual AccessKeys are stored in the CI platform's encrypted variables (GitHub uses Secrets, Alibaba Cloud DevOps uses pipeline variables)
 - During CI/CD execution, actual values are automatically injected via variable name references
 
 ### Q: Are bootstrap, scripts, and .github/workflows required?
-A: These directories are located under `ci-templates/oss-mns-relay/github/` and are specific to the GitHub + OSS MNS relay integration. If using other VCS platforms (e.g., GitLab, Yunxiao), you can use corresponding implementations, but similar functionality is required (code packaging/upload, deployment triggering, result reporting).
+A: These directories are located under `ci-templates/oss-mns-relay/github/` and are specific to the GitHub + OSS MNS relay integration. If using other VCS platforms (e.g., GitLab, Alibaba Cloud DevOps), you can use corresponding implementations, but similar functionality is required (code packaging/upload, deployment triggering, result reporting).
 
 ### Q: Does it support native Terraform configuration?
 A: This scaffold is based on Alibaba Cloud IacService and uses YAML configuration (tfcomponent.yaml, tfdeploy.yaml). For native Terraform HCL configuration, refer to the .tf files in the `ci-templates/oss-mns-relay/github/bootstrap` directory.
