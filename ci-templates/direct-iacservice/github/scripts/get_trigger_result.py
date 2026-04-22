@@ -18,6 +18,7 @@ from alibabacloud_iacservice20210806.client import Client as IaCService20210806C
 from alibabacloud_tea_openapi import models as open_api_models
 from alibabacloud_tea_openapi.exceptions import ClientException
 
+# 设置日志
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -38,22 +39,28 @@ def load_credentials(profile_name: str, code_path: str = "") -> Optional[Tuple[s
         Tuple of (access_key_id, access_key_secret) or None if not found
     """
     try:
+        # Determine the base path for credentials
         base_path = code_path if code_path else "."
         logger.info(f"Base path: {base_path}")
 
+        # Path to profile credentials file
         profile_credentials_path = f"{base_path}/deployments/{profile_name}/profile.yaml"
 
+        # Check if profile credentials file exists
         if not os.path.exists(profile_credentials_path):
             logger.warning(f"Profile credentials file not found: {profile_credentials_path}")
             return None
 
+        # Load profile credentials to get key names
         with open(profile_credentials_path, 'r') as f:
             profile_credentials = yaml.safe_load(f)
 
+        # Check if profile_credentials is a dictionary
         if not isinstance(profile_credentials, dict):
             logger.error(f"Profile credentials is not a dictionary: {profile_credentials}")
             return None
 
+        # Get access key names from profile credentials
         access_key_id_name = profile_credentials.get('access_key_id')
         access_key_secret_name = profile_credentials.get('access_key_secret')
         logger.info(f"Access key names: {access_key_id_name}, {access_key_secret_name}")
@@ -62,6 +69,7 @@ def load_credentials(profile_name: str, code_path: str = "") -> Optional[Tuple[s
             logger.warning(f"Access key names not found in profile credentials for {profile_name}")
             return None
 
+        # Get actual access key values
         access_key_id = os.getenv(access_key_id_name)
         access_key_secret = os.getenv(access_key_secret_name)
 
@@ -81,6 +89,7 @@ def create_iac_client(region: str, profile_name: str, code_path: str = "") -> Op
     try:
         logger.info(f"Creating IaCService client for region: {region}")
 
+        # Load credentials for the profile
         credentials = load_credentials(profile_name, code_path)
         if not credentials:
             logger.error(f"Failed to load credentials for profile {profile_name}")
@@ -107,8 +116,8 @@ def get_trigger_result(client: IaCService20210806Client, trigger_id: str) -> Opt
     """Get trigger result from API.
 
     Returns:
-        Dict: 当状态为终态(Success/Errored)时返回数据
-        None: 当状态为非终态或发生可重试异常时返回None
+        Dict: 当状态为终态 (Success/Errored) 时返回数据
+        None: 当状态为非终态或发生可重试异常时返回 None
     """
     try:
         logger.info(f"Getting trigger result for trigger_id: {trigger_id}")
@@ -126,6 +135,7 @@ def get_trigger_result(client: IaCService20210806Client, trigger_id: str) -> Opt
         else:
             data = vars(body) if hasattr(body, '__dict__') else {'data': body}
 
+        # ✅ 恢复状态检查：非终态返回 None，继续轮询
         status = data.get('triggeredStatus', '')
         if status not in ['Success', 'Errored']:
             logger.info(
@@ -141,6 +151,7 @@ def get_trigger_result(client: IaCService20210806Client, trigger_id: str) -> Opt
         error_message = str(e)
         error_str = repr(e)
         logger.error(f'Client exception, Failed to get  trigger result: {e}, error_str: {error_str}, error_message: {error_message}')
+        # Return custom map with errored status
         return {
             'trigger_id': trigger_id,
             'triggeredStatus': 'Errored',
@@ -158,9 +169,11 @@ def format_execution_result(data: Dict[str, Any]) -> str:
     try:
         output = []
 
+        # Main execution info
         status = data.get('triggeredStatus')
         trigger_id = data.get('triggerId')
 
+        # If both are empty/None, use 'Unknown'
         if not status and not trigger_id:
             trigger_id = 'Unknown'
             status = 'Unknown'
@@ -171,6 +184,7 @@ def format_execution_result(data: Dict[str, Any]) -> str:
 
         message = data.get('message', '')
 
+        # Status with emoji
         status_emoji = "✅" if status == "Success" else "❌" if status == "Errored" else "⚪"
 
         output.append("## 📋 Execution Information")
@@ -185,6 +199,7 @@ def format_execution_result(data: Dict[str, Any]) -> str:
 
         output.append("")
 
+        # Stack details
         stacks = data.get('stackResults', [])
         if stacks:
             output.append(f"## 📦 Stacks ({len(stacks)} total)")
@@ -195,6 +210,7 @@ def format_execution_result(data: Dict[str, Any]) -> str:
                 stack_status = stack.get('stackStatus', 'Unknown')
                 stack_message = stack.get('message', '')
 
+                # Stack status with emoji
                 stack_emoji = "✅" if stack_status == "Deployed" or stack_status == "DetectTriggered" else "❌" if stack_status == "Errored" else "⚪"
 
                 output.append(f"### {i}. Stack: {stack_name}")
@@ -205,6 +221,7 @@ def format_execution_result(data: Dict[str, Any]) -> str:
                     output.append(f"**Message:** {stack_message}")
                     output.append("")
 
+                # Deployment details
                 deployments = stack.get('deployments', [])
                 if deployments:
                     output.append(f"#### 🚀 Deployments ({len(deployments)} total)")
@@ -218,6 +235,7 @@ def format_execution_result(data: Dict[str, Any]) -> str:
                         job_result = deployment.get('jobResult', '')
                         deploy_url = deployment.get('url', '')
 
+                        # Deployment status with emoji
                         deploy_emoji = {
                             "Applied": "✅",
                             "Planned": "✅",
@@ -227,6 +245,7 @@ def format_execution_result(data: Dict[str, Any]) -> str:
                             "Errored": "❌"
                         }.get(deploy_status, "⚪")
 
+                        # Format job result and details
                         job_result_display = f"`{job_result}`" if job_result else "-"
                         details_link = f'<a href="{deploy_url}" target="_blank">View Details</a>' if deploy_url else "-"
 
@@ -240,6 +259,7 @@ def format_execution_result(data: Dict[str, Any]) -> str:
                     output.append("*No deployments found*")
                     output.append("")
 
+                # Add separator between stacks
                 if i < len(stacks):
                     output.append("---")
                     output.append("")
@@ -273,10 +293,11 @@ def parse_result_path(result_path: str) -> List[tuple]:
 def poll_trigger_result(profile: str, trigger_id: str, region: str, code_path: str,
                         max_wait_time: int, results: List, lock: threading.Lock) -> None:
     """Poll API for trigger result in a separate thread."""
-    poll_interval = 10
+    poll_interval = 10  # Fixed polling interval: 10 seconds
 
     logger.info(f"Processing profile: {profile}")
 
+    # Create IAC client
     client = create_iac_client(region, profile, code_path)
     if not client:
         logger.error(f"Failed to create IAC client for profile {profile}")
@@ -297,6 +318,7 @@ def poll_trigger_result(profile: str, trigger_id: str, region: str, code_path: s
 
         result = get_trigger_result(client, trigger_id)
         if result:
+            # ✅ result 不为 None，说明已经是终态(Success/Errored)
             logger.info(
                 f"Terminal state reached for {profile}, "
                 f"status: {result.get('triggeredStatus')}"
@@ -305,6 +327,7 @@ def poll_trigger_result(profile: str, trigger_id: str, region: str, code_path: s
                 results.append({'profile': profile, 'result': result})
             break
 
+        # result 为 None：状态为 InProgress 或发生可重试异常
         logger.info(
             f"Trigger still in progress for {profile}, "
             f"waiting {poll_interval}s before next attempt..."
@@ -345,11 +368,13 @@ def main():
     args = parser.parse_args()
 
     try:
+        # Parse result path
         entries = parse_result_path(args.result_path)
         if not entries:
             logger.error("No valid entries found in result path")
             exit(1)
 
+        # Process each trigger ID in parallel
         threads = []
         all_results = []
         lock = threading.Lock()
@@ -363,6 +388,7 @@ def main():
             threads.append(thread)
             thread.start()
 
+        # Wait for all threads to complete
         for thread in threads:
             thread.join()
 
@@ -370,6 +396,7 @@ def main():
             logger.error("Failed to retrieve results")
             exit(1)
 
+        # Format results
         formatted_outputs = []
         for result in all_results:
             profile = result['profile']
@@ -378,6 +405,7 @@ def main():
 
         final_output = "\n\n---\n\n".join(formatted_outputs)
 
+        # Write to file if specified
         if args.output_file:
             with open(args.output_file, 'w', encoding='utf-8') as f:
                 f.write(final_output)

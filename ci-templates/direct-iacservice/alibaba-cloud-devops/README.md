@@ -215,7 +215,7 @@ trusted-host = mirrors.aliyun.com
 EOF
 
 python -m pip install --upgrade pip
-pip install alibabacloud_iacservice20210806
+pip install alibabacloud_iacservice20210806==2.6.1
 pip install PyYAML
 ```
 
@@ -356,7 +356,7 @@ trusted-host = mirrors.aliyun.com
 EOF
 
 python -m pip install --upgrade pip
-pip install alibabacloud_iacservice20210806
+pip install alibabacloud_iacservice20210806==2.6.1
 pip install PyYAML
 ```
 
@@ -497,7 +497,7 @@ trusted-host = mirrors.aliyun.com
 EOF
 
 python -m pip install --upgrade pip
-pip install alibabacloud_iacservice20210806
+pip install alibabacloud_iacservice20210806==2.6.1
 pip install PyYAML
 ```
 

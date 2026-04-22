@@ -91,6 +91,9 @@ alibabacloud-terraform-scaffold/
 │   │       ├── bootstrap/         # 环境初始化配置
 │   │       └── scripts/           # CI/CD 辅助脚本
 │   └── direct-iacservice/         # 直接连接自动化服务台模式
+│       ├── github/                # GitHub 集成方案
+│       │   ├── .github/workflows/ # GitHub 工作流
+│       │   └── scripts/           # CI/CD 辅助脚本
 │       └── alibaba-cloud-devops/         # 阿里云云效 集成方案
 │           └── scripts/           # CI/CD 辅助脚本
 ├── docs/                           # 文档目录
@@ -179,7 +182,7 @@ alibabacloud-terraform-scaffold/
 
 | 连接模式 | GitHub | 阿里云云效 |
 |---------|--------|------------|
-| **直连自动化服务台** | 🚧 规划中 | ✅ [查看文档](ci-templates/direct-iacservice/alibaba-cloud-devops/README-CN.md) |
+| **直连自动化服务台** | ✅ [查看文档](ci-templates/direct-iacservice/github/README-CN.md) | ✅ [查看文档](ci-templates/direct-iacservice/alibaba-cloud-devops/README-CN.md) |
 | **OSS MNS 中转 (不推荐)** | ✅ [查看文档](ci-templates/oss-mns-relay/github/README-CN.md) | ✅ [查看文档](ci-templates/oss-mns-relay/alibaba-cloud-devops/README-CN.md) |
 
 
@@ -187,9 +190,8 @@ alibabacloud-terraform-scaffold/
 ### 直连自动化服务台模式
 直接调用阿里云 IacService API 进行部署，链路更短、延迟更低。
 
+- **GitHub**：详见 [`ci-templates/direct-iacservice/github/`](ci-templates/direct-iacservice/github/README-CN.md)
 - **阿里云云效**：详见 [`ci-templates/direct-iacservice/alibaba-cloud-devops/`](ci-templates/direct-iacservice/alibaba-cloud-devops/README-CN.md)
-
-> 📝 **持续完善中**：更多 VCS 平台和连接模式的支持正在编写中，欢迎 [提交 Issue](https://github.com/alibabacloud-automation/alibabacloud-terraform-scaffold/issues/new) 反馈需求。
 
 ### OSS MNS 中转模式（不推荐）
 通过阿里云 OSS 和 MNS 服务实现事件驱动的部署流程，适用于需要解耦 VCS 事件与部署执行的场景。

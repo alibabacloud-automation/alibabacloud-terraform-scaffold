@@ -91,6 +91,9 @@ alibabacloud-terraform-scaffold/
 │   │       ├── bootstrap/         # Environment initialization config
 │   │       └── scripts/           # CI/CD helper scripts
 │   └── direct-iacservice/         # Direct IacService connection mode
+│       ├── github/                # GitHub integration
+│       │   ├── .github/workflows/ # GitHub workflows
+│       │   └── scripts/           # CI/CD helper scripts
 │       └── alibaba-cloud-devops/         # Alibaba Cloud DevOps integration
 │           └── scripts/           # CI/CD helper scripts
 ├── docs/                           # Documentation directory
@@ -179,7 +182,7 @@ This scaffold provides multiple VCS integration implementations, organized by **
 
 | Connection Mode | GitHub | Alibaba Cloud DevOps |
 |----------------|--------|----------------|
-| **Direct IacService** | 🚧 Planned | ✅ [View Docs](ci-templates/direct-iacservice/alibaba-cloud-devops/README.md) |
+| **Direct IacService** |  ✅ [View Docs](ci-templates/direct-iacservice/github/README.md) | ✅ [View Docs](ci-templates/direct-iacservice/alibaba-cloud-devops/README.md) |
 | **OSS MNS Relay (Not Recommended)** | ✅ [View Docs](ci-templates/oss-mns-relay/github/README.md) | ✅ [View Docs](ci-templates/oss-mns-relay/alibaba-cloud-devops/README.md) |
 
 
@@ -187,9 +190,8 @@ This scaffold provides multiple VCS integration implementations, organized by **
 ### Direct IacService Mode
 Deploys directly via Alibaba Cloud IacService API, with shorter link chain and lower latency.
 
+- **GitHub**: See [`ci-templates/direct-iacservice/github/`](ci-templates/direct-iacservice/github/README.md)
 - **Alibaba Cloud DevOps**: See [`ci-templates/direct-iacservice/alibaba-cloud-devops/`](ci-templates/direct-iacservice/alibaba-cloud-devops/README.md)
-
-> 📝 **Work in Progress**: Support for more VCS platforms and connection modes is being developed. Feel free to [submit an Issue](https://github.com/alibabacloud-automation/alibabacloud-terraform-scaffold/issues/new) with your requirements.
 
 ### OSS MNS Relay Mode (Not Recommended)
 Implements event-driven deployment workflows through Alibaba Cloud OSS and MNS services, suitable for scenarios requiring decoupling of VCS events from deployment execution.
