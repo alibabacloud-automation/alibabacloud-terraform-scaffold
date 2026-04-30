@@ -182,19 +182,40 @@ alibabacloud-terraform-scaffold/
 
 | 连接模式 | GitHub | 阿里云云效 |
 |---------|--------|------------|
-| **直连自动化服务台** | ✅ [查看文档](ci-templates/direct-iacservice/github/README-CN.md) | ✅ [查看文档](ci-templates/direct-iacservice/alibaba-cloud-devops/README-CN.md) |
-| **OSS MNS 中转 (不推荐)** | ✅ [查看文档](ci-templates/oss-mns-relay/github/README-CN.md) | ✅ [查看文档](ci-templates/oss-mns-relay/alibaba-cloud-devops/README-CN.md) |
+| **直连自动化服务台** (推荐) | ✅ [查看文档](ci-templates/direct-iacservice/github/README-CN.md) | ✅ [查看文档](ci-templates/direct-iacservice/alibaba-cloud-devops/README-CN.md) |
+| **OSS MNS 中转** (仅遗留项目) | ✅ [查看文档](ci-templates/oss-mns-relay/github/README-CN.md) | ✅ [查看文档](ci-templates/oss-mns-relay/alibaba-cloud-devops/README-CN.md) |
 
 
+### 直连自动化服务台模式（推荐）
+直接调用阿里云 IacService API 进行部署，链路更短、延迟更低。**推荐所有新项目使用**。
 
-### 直连自动化服务台模式
-直接调用阿里云 IacService API 进行部署，链路更短、延迟更低。
+**架构图：**
+```
+Developer → VCS → IacService API → 执行 → 结果
+```
+
+**优势：**
+- ✅ 架构简单（无需 OSS/MNS）
+- ✅ 延迟低（直接 API 调用）
+- ✅ 易于维护（组件少）
+- ✅ 成本低（无 OSS/MNS 费用）
 
 - **GitHub**：详见 [`ci-templates/direct-iacservice/github/`](ci-templates/direct-iacservice/github/README-CN.md)
 - **阿里云云效**：详见 [`ci-templates/direct-iacservice/alibaba-cloud-devops/`](ci-templates/direct-iacservice/alibaba-cloud-devops/README-CN.md)
 
-### OSS MNS 中转模式（不推荐）
-通过阿里云 OSS 和 MNS 服务实现事件驱动的部署流程，适用于需要解耦 VCS 事件与部署执行的场景。
+### OSS MNS 中转模式（仅遗留项目）
+通过阿里云 OSS 和 MNS 服务实现事件驱动的部署流程。**仅建议已有 OSS/MNS 基础设施的遗留项目使用**。
+
+**架构图：**
+```
+Developer → VCS → OSS (代码 + 触发) → MNS → IacService → 执行 → OSS (结果) → VCS
+```
+
+**注意事项：**
+- ⚠️ 需要 OSS Bucket、MNS Topic/Queue/Subscription、Event Rule
+- ⚠️ 架构复杂
+- ⚠️ 延迟高（事件驱动）
+- ⚠️ 成本高（OSS 存储费 + MNS 费用）
 
 - **GitHub**：详见 [`ci-templates/oss-mns-relay/github/`](ci-templates/oss-mns-relay/github/README-CN.md)
 - **阿里云云效**：详见 [`ci-templates/oss-mns-relay/alibaba-cloud-devops/`](ci-templates/oss-mns-relay/alibaba-cloud-devops/README-CN.md)

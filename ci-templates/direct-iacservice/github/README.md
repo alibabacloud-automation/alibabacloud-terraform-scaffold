@@ -257,9 +257,9 @@ Click [Stack], select [Create Stack].
 |-----------|----------|-------------|
 | Stack Name | Yes | The name of the stack, must be unique |
 | Description | No | Description of the stack |
-| Stack Code Source | Yes | **Module (Recommended)**: Select template from IacService<br>**OSS (Not Recommended)**: Code stored via OSS (more dependencies, complex) |
+| Stack Code Source | Yes | **Module**: Select template from IacService created in Prerequisites<br>⚠️ **Note**: Direct mode only supports Module source, OSS source is not available |
 | Template ID/Version | Yes | Select the template created in Prerequisites |
-| Working Directory | Yes | The path where the stack configuration file is stored in the code |
+| Working Directory | Yes | The path where the stack configuration file is stored in the code, e.g., `stacks/demo`                                                                                    |
 | RAM Role | Yes | Select the role created in Prerequisites for running Terraform templates |
 
 **Step 3: Associate Parameter Set**

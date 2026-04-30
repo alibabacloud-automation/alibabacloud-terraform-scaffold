@@ -150,6 +150,10 @@ Declares the components referenced by the Stack.
 | depends_on | Names of other components this depends on / component 所依赖的其他 components 的名称 | No / 否 | list(string) | ["component.vpc"] |
 | for_each | Loop configuration / 支持循环配置 | No / 否 | string | var.regions |
 
+**Note / 注意事项：**
+
+- In `inputs`, if the value is a variable reference or expression, it must use the `var.xxx` format / `inputs` 中 value 若为变量引用或表达式，需使用 `var.xxx` 格式表示引用
+
 **Example / 示例:**
 
 ```yaml
@@ -374,6 +378,38 @@ deployment:
       vswitch_cidrs: ["192.168.1.0/24", "192.168.2.0/24"]
 ```
 
+### orchestrate
+
+Declares specific behaviors during Stack deployment.
+
+用来声明 Stack 在部署时的具体行为。
+
+**Fields / 字段说明：**
+
+| Field / 字段 | Description / 描述 | Required / 必填 | Type / 类型 | Example / 示例值 |
+|------|------|------|------|--------|
+| type | Rule type, either `auto_approve` or `replan` / 声明规则的类型，auto_approve 或者 replan | Yes / 是 | string | auto_approve |
+| name | Unique identifier of the rule in the template / 声明规则在模板中的唯一标识 | Yes / 是 | string | no_pet_changes |
+| check | Conditional behavior when executing specific rules / 执行具体规则时的条件行为 | Yes / 是 | list(object) | |
+
+**check 包含以下属性 / check contains the following properties：**
+
+| Field / 字段 | Description / 描述 | Required / 必填 | Type / 类型 | Example / 示例值 |
+|------|------|------|------|--------|
+| condition | Expression that determines whether the check passes / 确定检查是否通过的表达式 | Yes / 是 | expression | context.plan.component_changes["component.pet"].total == 0 |
+| reason | Reason for check failure / 检查失败的原因 | Yes / 是 | string | "Changes proposed to pet component." |
+
+**Example / 示例：**
+
+```yaml
+orchestrate:
+  - type: auto_approve
+    name: no_pet_changes
+    check:
+      - condition: context.plan.component_changes["component.vpc"].total == 0
+        reason: "Changes proposed to vpc component."
+```
+
 ### locals
 
 Declares common parameters for Stack deployment.
@@ -475,6 +511,13 @@ deployment:
         environment: "production"
       zone_ids: ["cn-beijing-l", "cn-beijing-k"]
       vswitch_cidrs: ["192.168.1.0/24", "192.168.2.0/24"]
+
+orchestrate:
+  - type: auto_approve
+    name: no_pet_changes
+    check:
+      - condition: context.plan.component_changes["component.vpc"].total == 0
+        reason: "Changes proposed to vpc component."
 
 publish_output:
   - name: prod_vpc_id

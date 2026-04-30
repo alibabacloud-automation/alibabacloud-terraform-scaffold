@@ -658,9 +658,15 @@ Here is how to create the `stacks/demo` Stack — the same process applies to ot
    Log in to Alibaba Cloud IacService (https://iac.console.aliyun.com/stack) and select "Create Stack"
 
 2. **Fill in Stack Information**
-   - **Code Module**: Select the IacService module created in the prerequisites
-   - **Working Directory**: The path where the Stack is stored in the code, e.g., `stacks/demo`
-   - **RAM Role**: Select the role trusted by IacService for Stack operations
+
+| Parameter | Required | Description                                                                                                                                          |
+|-----------|----------|------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Stack Name | Yes | The name of the stack, must be unique                                                                                                                |
+| Description | No | Description of the stack                                                                                                                             |
+| Stack Code Source | Yes | **Module**: Select template from IacService created in Prerequisites<br>⚠️ **Note**: Direct mode only supports Module source, OSS source is not available |
+| Template ID/Version | Yes | Select the template created in Prerequisites                                                                                                         |
+| Working Directory | Yes | The path where the stack configuration file is stored in the code, e.g., `stacks/demo`                                                                                    |
+| RAM Role | Yes | Select the role created in Prerequisites for running Terraform templates                                                                             |
 
 > **Batch Creation**: It is recommended to create all Stacks defined under the `stacks/` directory at once. Each Stack corresponds to an independent resource stack. After creation, an initial `plan` will be automatically executed to verify configuration correctness.
 

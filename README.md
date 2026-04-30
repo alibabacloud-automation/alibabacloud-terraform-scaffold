@@ -182,19 +182,40 @@ This scaffold provides multiple VCS integration implementations, organized by **
 
 | Connection Mode | GitHub | Alibaba Cloud DevOps |
 |----------------|--------|----------------|
-| **Direct IacService** |  ✅ [View Docs](ci-templates/direct-iacservice/github/README.md) | ✅ [View Docs](ci-templates/direct-iacservice/alibaba-cloud-devops/README.md) |
-| **OSS MNS Relay (Not Recommended)** | ✅ [View Docs](ci-templates/oss-mns-relay/github/README.md) | ✅ [View Docs](ci-templates/oss-mns-relay/alibaba-cloud-devops/README.md) |
+| **Direct IacService** (Recommended) |  ✅ [View Docs](ci-templates/direct-iacservice/github/README.md) | ✅ [View Docs](ci-templates/direct-iacservice/alibaba-cloud-devops/README.md) |
+| **OSS MNS Relay** (Legacy only) | ✅ [View Docs](ci-templates/oss-mns-relay/github/README.md) | ✅ [View Docs](ci-templates/oss-mns-relay/alibaba-cloud-devops/README.md) |
+
+### Direct IacService Mode (Recommended)
+Deploys directly via Alibaba Cloud IacService API, with shorter link chain and lower latency. **Recommended for all new projects.**
 
 
+**Architecture:**
+```
+Developer → VCS → IacService API → Execution → Result
+```
 
-### Direct IacService Mode
-Deploys directly via Alibaba Cloud IacService API, with shorter link chain and lower latency.
+**Advantages:**
+- ✅ Simpler architecture (no OSS/MNS required)
+- ✅ Lower latency (direct API calls)
+- ✅ Easier maintenance (fewer moving parts)
+- ✅ Lower cost (no OSS/MNS fees)
 
 - **GitHub**: See [`ci-templates/direct-iacservice/github/`](ci-templates/direct-iacservice/github/README.md)
 - **Alibaba Cloud DevOps**: See [`ci-templates/direct-iacservice/alibaba-cloud-devops/`](ci-templates/direct-iacservice/alibaba-cloud-devops/README.md)
 
-### OSS MNS Relay Mode (Not Recommended)
-Implements event-driven deployment workflows through Alibaba Cloud OSS and MNS services, suitable for scenarios requiring decoupling of VCS events from deployment execution.
+### OSS MNS Relay Mode (Legacy only)
+Implements event-driven deployment workflows through Alibaba Cloud OSS and MNS services. **Only recommended for legacy projects with existing OSS/MNS infrastructure.**
+
+**Architecture:**
+```
+Developer → VCS → OSS (Code+Trigger) → MNS → IacService → Execution → OSS (Result) → VCS
+```
+
+**Considerations:**
+- ⚠️ Requires OSS Bucket, MNS Topic/Queue/Subscription, Event Rule
+- ⚠️ More complex architecture
+- ⚠️ Higher latency (event-driven)
+- ⚠️ Additional costs (OSS storage + MNS fees)
 
 - **GitHub**: See [`ci-templates/oss-mns-relay/github/`](ci-templates/oss-mns-relay/github/README.md)
 - **Alibaba Cloud DevOps**: See [`ci-templates/oss-mns-relay/alibaba-cloud-devops/`](ci-templates/oss-mns-relay/alibaba-cloud-devops/README.md)
