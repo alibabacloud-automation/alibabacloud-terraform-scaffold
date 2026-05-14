@@ -378,6 +378,57 @@ deployment:
       vswitch_cidrs: ["192.168.1.0/24", "192.168.2.0/24"]
 ```
 
+### store
+
+Declares parameter set references for deployment. The `store` block is used to reference a pre-defined variable set (parameter set) so that sensitive or shared variables can be centrally managed and reused across multiple Stacks.
+
+用来声明 Stack 在部署时对参数集的引用。`store` 块用于引用已创建的参数集（Variable Set），实现敏感参数或共享变量在多 Stack 之间的集中管理和复用。
+
+**Fields / 字段说明：**
+
+| Field / 字段 | Description / 描述 | Required / 必填 | Type / 类型 | Example / 示例值 |
+|------|------|------|------|--------|
+| type | Store type, currently only supports `varset` / 存储类型，当前仅支持 `varset` | Yes / 是 | string | varset |
+| store_name | Reference name used within the Stack / 在 Stack 中使用的引用名称 | Yes / 是 | string | tokens |
+| name | Name of the parameter set / 参数集名称，与 `id` 二选一 | No / 否 | string | my-parameter-set |
+| id | ID of the parameter set / 参数集 ID，与 `name` 二选一 | No / 否 | string | ps-xxxxxx |
+| category | Parameter set category, currently only supports `terraform` / 参数集类别，当前仅支持 `terraform` | No / 否 | string | terraform |
+
+**Reference syntax / 引用方式：**
+
+In `deployment.inputs`, you can reference a variable from a parameter set using the following format:
+
+在 `deployment.inputs` 中，可以通过以下格式引用参数集中的变量：
+
+```
+store.<STORE_TYPE>.<STORE_NAME>.<VARIABLE_NAME>
+```
+
+**Example / 示例：**
+
+```yaml
+store:
+  - type: "varset"
+    store_name: "tokens"
+    name: "my-token-set"
+    category: "terraform"
+
+deployment:
+  - name: "main"
+    inputs:
+      api_token: store.varset.tokens.access_token
+      db_password: store.varset.tokens.db_password
+```
+
+**Notes / 注意事项：**
+
+- Either `name` or `id` must be specified to uniquely identify the parameter set. If both are provided, `id` takes precedence.
+  - `name` 和 `id` 必须至少指定一个，用于唯一确定参数集。若两者同时填写，以 `id` 为准。
+- Variables marked as sensitive in the parameter set will be automatically masked in the UI, logs, and API responses.
+  - 参数集中标记为敏感的变量，在 UI、日志和接口返回中会自动掩码处理。
+- When referencing a sensitive variable in `deployment.inputs`, the corresponding Stack Component variable should declare `sensitive: true`.
+  - 在 `deployment.inputs` 中引用敏感变量时，对应的 Stack Component 变量应声明 `sensitive: true`。
+
 ### orchestrate
 
 Declares specific behaviors during Stack deployment.
@@ -490,6 +541,12 @@ upstream_input:
     type: stack
     source: "iac.aliyuncs.com/{AccountId}/{StackName}"
 
+store:
+  - type: "varset"
+    store_name: "tokens"
+    name: "my-token-set"
+    category: "terraform"
+
 deployment:
   - name: development
     inputs:
@@ -500,17 +557,18 @@ deployment:
         environment: "development"
       zone_ids: ["cn-hangzhou-j", "cn-hangzhou-k"]
       vswitch_cidrs: ["192.168.1.0/24", "192.168.2.0/24"]
+      api_token: store.varset.tokens.access_token
       
   - name: production
     inputs:
       region: "cn-beijing"
-      # vpc_name: "vpc-prod"
       vpc_name: upstream_input.upstream_stack.vpc_name
       vpc_cidr: "192.168.0.0/16"
       tags:
         environment: "production"
       zone_ids: ["cn-beijing-l", "cn-beijing-k"]
       vswitch_cidrs: ["192.168.1.0/24", "192.168.2.0/24"]
+      api_token: store.varset.tokens.access_token
 
 orchestrate:
   - type: auto_approve
