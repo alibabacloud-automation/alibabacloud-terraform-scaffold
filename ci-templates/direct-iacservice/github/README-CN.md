@@ -16,6 +16,7 @@
   - [工作流依赖关系](#工作流依赖关系)
 - [日常使用](#日常使用)
   - [创建自动化服务台资源栈](#创建自动化服务台资源栈)
+  - [配置保密参数](#配置保密参数)
   - [变更流程](#变更流程)
   - [运行参数说明](#运行参数说明)
 - [运维参考](#运维参考)
@@ -262,11 +263,87 @@ scheduled-check.yml
 
 选择或创建参数集，点击【下一步】。
 
+> **保密参数说明**：参数集支持定义保密参数（如密码、API Token、访问密钥等）。标记为保密的参数值会自动基于阿里云 KMS 加密存储，在 UI、日志和接口返回中均以掩码展示，无法查看明文。保密属性一旦设置不可取消。在 Stack 中引用保密参数时，对应的组件变量必须声明 `sensitive: true`。
+
 **步骤 4：确认创建**
 
 检查配置信息无误后，点击【创建】。
 
 > **批量创建**：建议将 `stacks/` 目录下定义的所有 Stack 一次性全部创建。每个 Stack 对应一个独立的资源栈，创建完成后会自动执行首次 `plan`，可验证配置的正确性。
+
+---
+
+## 配置保密参数
+
+保密参数适用于在参数集中存储密码、API Token、访问密钥等机密信息。标记为保密的参数值会自动加密存储，并在全链路中隐藏明文。
+
+### 前提条件：设置加密密钥
+
+首次使用保密参数前，需要为当前主账号配置加密密钥：
+
+1. 进入**系统设置 > 加密设置**。
+2. 首次配置时，系统会引导完成服务关联角色（SLR）授权。
+3. 选择密钥类型：
+   - **服务密钥**：不指定密钥时系统自动创建，无需手动维护，适合快速上手。
+   - **用户主密钥**：选择您在 KMS 中创建的密钥，适用于需要自行管理密钥生命周期的场景。
+4. 保存设置。
+
+> **密钥轮转**：支持更换密钥，更换后新写入的保密值使用新密钥加密，历史数据通过旧密钥解密。请确保旧密钥始终保持启用状态。
+>
+> **密钥删除保护**：在 KMS 中删除密钥前，系统会自动校验是否存在关联的加密资源。若仍有资源使用该密钥，系统将阻止删除。
+
+### 在参数集中创建保密参数
+
+1. 进入参数集列表页面，创建新参数集或编辑已有参数集。
+2. 点击 **新增参数**，填写参数名称和参数值。
+3. 勾选 **保密** 选项。
+4. 保存参数集。
+
+保存后，参数值在界面上以掩码形式展示，明文不可再被查看。
+
+**注意**：
+
+- 保密属性一旦设置不可取消，如需调整请删除参数后重新创建。
+- 保密参数仅支持修改值（直接输入新值覆盖），无需提供旧值。
+
+### 在 Stack Component 中声明保密变量
+
+Stack 中需要接收保密参数值的组件变量，必须在变量定义中声明 `sensitive: true`：
+
+```yaml
+variable:
+  - name: db_password
+    type: string
+    sensitive: true
+    description: "数据库密码"
+
+  - name: api_token
+    type: string
+    sensitive: true
+    description: "API 访问令牌"
+```
+
+### 在 Deployment 中引用保密参数集
+
+通过 `store` 块引用包含保密参数的参数集，在 `deployment.inputs` 中使用引用格式传递变量值：
+
+```yaml
+store:
+  - type: "varset"
+    store_name: "credentials"
+    name: "my-credentials-set"
+    category: "terraform"
+
+deployment:
+  - name: "main"
+    inputs:
+      db_password: store.varset.credentials.db_password
+      api_token: store.varset.credentials.api_token
+```
+
+引用格式为：`store.<STORE_TYPE>.<STORE_NAME>.<VARIABLE_NAME>`
+
+保密值在 Stack 执行时会自动解密并注入运行时环境，但在控制台界面、运行日志和 PR 回写结果中仍以掩码形式展示。
 
 ---
 
@@ -335,6 +412,7 @@ iac terraform plan/apply [-profile=<profileName>] [-stack=<StackName>]
 | 结果获取超时 | 默认轮询超时 600 秒，检查 IacService 控制台确认 Stack 是否正在执行 |
 | 多环境部分失败 | 查看 GitHub Actions 日志，`shared-ci-upload-source-package` 会列出失败的 profile 名称 |
 | 查看详细错误信息 | 查看 GitHub Actions 运行日志，或检查 IacService 控制台中的执行记录 |
+| 敏感参数解密失败 | 检查加密配置是否已初始化（系统设置 > 加密设置）、KMS 密钥是否处于启用状态且未被删除或禁用 |
 
 ---
 
