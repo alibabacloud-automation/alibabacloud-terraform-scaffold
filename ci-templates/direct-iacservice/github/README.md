@@ -16,6 +16,7 @@ A CI/CD integration solution based on GitHub Actions and Alibaba Cloud IacServic
   - [Workflow Dependencies](#workflow-dependencies)
 - [Daily Usage](#daily-usage)
   - [Create IacService Stack](#create-iacservice-stack)
+  - [Configure Secret Parameters](#configure-secret-parameters)
   - [Change Process](#change-process)
   - [Running Parameters](#running-parameters)
 - [Operations Reference](#operations-reference)
@@ -266,11 +267,28 @@ Click [Stack], select [Create Stack].
 
 Select or create a parameter set, click [Next].
 
+> **Tip**: Parameter sets support defining secret parameters for securely storing passwords, tokens, and other confidential data. See [Configure Secret Parameters](#configure-secret-parameters) below for details.
+
 **Step 4: Confirm Creation**
 
 After checking the configuration information is correct, click [Create].
 
 > **Batch Creation**: It is recommended to create all Stacks defined in the `stacks/` directory at once. Each Stack corresponds to an independent stack. After creation, the first `plan` will be automatically executed to verify the correctness of the configuration.
+
+---
+
+## Configure Secret Parameters
+
+Parameter sets support defining secret parameters for securely storing passwords, API Tokens, access keys, and other confidential information. Secret values are automatically encrypted via Alibaba Cloud KMS and masked across the console UI, execution logs, API responses, and PR comment results.
+
+Basic workflow for using secret parameters:
+
+1. **Set up encryption key**: Navigate to **System Settings > Encryption Settings**, select a Service Key (auto-created) or User-Managed Key (created in KMS).
+2. **Create secret parameters**: When adding a parameter in a parameter set, check the **Secret** option and save.
+3. **Declare component variables**: In the Stack Component, variables receiving secret values must declare `sensitive: true`.
+4. **Reference the parameter set**: In Deployment configuration, reference the parameter set via the `store` block using the format `store.varset.<STORE_NAME>.<VARIABLE_NAME>`.
+
+For detailed instructions (including key rotation, encryption principles, FAQ, etc.), see the [Secret Parameters Guide](../../../docs/secret-parameters.md).
 
 ---
 

@@ -15,6 +15,7 @@ CI/CD integration solution based on GitHub Actions and Alibaba Cloud IacService,
   - [Workflow Dependencies](#workflow-dependencies)
 - [Daily Usage](#daily-usage)
   - [Create IacService Stacks](#create-iac-service-stacks)
+  - [Configure Secret Parameters](#configure-secret-parameters)
   - [Change Workflow](#change-workflow)
   - [Runtime Parameter Reference](#runtime-parameter-reference)
 - [Operations Reference](#operations-reference)
@@ -226,6 +227,19 @@ Go to Alibaba Cloud IacService (https://iac.console.aliyun.com/stack) to create 
 - **Working Directory**: Fill in the stack's relative path, e.g., `stacks/demo`
 
 > **Batch Creation**: It is recommended to create all Stacks defined under the `stacks/` directory at once. Each Stack corresponds to an independent resource stack. After creation, an initial `plan` will be automatically executed to verify configuration correctness.
+
+## Configure Secret Parameters
+
+Parameter sets support defining secret parameters for securely storing passwords, API Tokens, access keys, and other confidential information. Secret values are automatically encrypted via Alibaba Cloud KMS and masked across the console UI, execution logs, API responses, and PR comment results.
+
+Basic workflow for using secret parameters:
+
+1. **Set up encryption key**: Navigate to **System Settings > Encryption Settings**, select a Service Key (auto-created) or User-Managed Key (created in KMS).
+2. **Create secret parameters**: When adding a parameter in a parameter set, check the **Secret** option and save.
+3. **Declare component variables**: In the Stack Component, variables receiving secret values must declare `sensitive: true`.
+4. **Reference the parameter set**: In Deployment configuration, reference the parameter set via the `store` block using the format `store.varset.<STORE_NAME>.<VARIABLE_NAME>`.
+
+For detailed instructions (including key rotation, encryption principles, FAQ, etc.), see the [Secret Parameters Guide](../../../docs/secret-parameters.md).
 
 ## Change Workflow
 
