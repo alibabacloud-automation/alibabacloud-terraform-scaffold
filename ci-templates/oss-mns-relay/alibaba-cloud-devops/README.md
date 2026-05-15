@@ -30,6 +30,7 @@ CI/CD integration solution based on Alibaba Cloud DevOps (CodeUp + Flow) and Ali
   - [Create IacService Stacks](#create-iacservice-stacks)
     - [1. Upload Code to OSS](#1-upload-code-to-oss)
     - [2. Create Stacks](#2-create-stacks)
+  - [Configure Secret Parameters](#configure-secret-parameters)
   - [Change Workflow](#change-workflow)
   - [Runtime Parameter Reference](#runtime-parameter-reference)
 - [Operations Reference](#operations-reference)
@@ -726,6 +727,19 @@ Here is how to create the `stacks/demo` Stack — the same process applies to ot
    - **RAM Role**: Select the role created by the initialization script for running Terraform templates
 
 > **Batch Creation**: It is recommended to create all Stacks defined under the `stacks/` directory at once. Each Stack corresponds to an independent resource stack. After creation, an initial `plan` will be automatically executed to verify configuration correctness.
+
+## Configure Secret Parameters
+
+Parameter sets support defining secret parameters for securely storing passwords, API Tokens, access keys, and other confidential information. Secret values are automatically encrypted via Alibaba Cloud KMS and masked across the console UI, execution logs, API responses, and pipeline output results.
+
+Basic workflow for using secret parameters:
+
+1. **Set up encryption key**: Navigate to **System Settings > Encryption Settings**, select a Service Key (auto-created) or User-Managed Key (created in KMS).
+2. **Create secret parameters**: When adding a parameter in a parameter set, check the **Secret** option and save.
+3. **Declare component variables**: In the Stack Component, variables receiving secret values must declare `sensitive: true`.
+4. **Reference the parameter set**: In Deployment configuration, reference the parameter set via the `store` block using the format `store.varset.<STORE_NAME>.<VARIABLE_NAME>`.
+
+For detailed instructions (including key rotation, encryption principles, FAQ, etc.), see the [Secret Parameters Guide](../../../docs/secret-parameters.md).
 
 ## Change Workflow
 
