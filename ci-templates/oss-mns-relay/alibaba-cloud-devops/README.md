@@ -737,7 +737,8 @@ Basic workflow for using secret parameters:
 1. **Set up encryption key**: Navigate to **System Settings > Encryption Settings**, select a Service Key (auto-created) or User-Managed Key (created in KMS).
 2. **Create secret parameters**: When adding a parameter in a parameter set, check the **Secret** option and save.
 3. **Declare component variables**: In the Stack Component, variables receiving secret values must declare `sensitive: true`.
-4. **Reference the parameter set**: In Deployment configuration, reference the parameter set via the `store` block using the format `store.varset.<STORE_NAME>.<VARIABLE_NAME>`.
+4. **Associate Parameter Set**: When creating the Stack, associate it with the parameter set that contains your secret parameters.
+5. **Reference the parameter set**: In Deployment configuration, reference the parameter set via the `store` block using the format `store.varset.<STORE_NAME>.<VARIABLE_NAME>`.
 
 For detailed instructions (including key rotation, encryption principles, FAQ, etc.), see the [Secret Parameters Guide](../../../docs/secret-parameters.md).
 
