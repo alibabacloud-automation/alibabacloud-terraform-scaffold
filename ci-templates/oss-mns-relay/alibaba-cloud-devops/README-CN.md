@@ -737,7 +737,8 @@ fi
 1. **设置加密密钥**：进入**系统设置 > 加密设置**，选择服务密钥（系统自动创建）或用户主密钥（自行在 KMS 创建）。
 2. **创建保密参数**：在参数集中新增参数时，勾选 **保密** 选项并保存。
 3. **声明组件变量**：在 Stack Component 中，接收保密值的变量必须声明 `sensitive: true`。
-4. **引用参数集**：在 Deployment 配置中通过 `store` 块引用参数集，格式为 `store.varset.<STORE_NAME>.<VARIABLE_NAME>`。
+4. **关联参数集**：在创建 Stack 时，将 Stack 关联到已配置保密参数的参数集。
+5. **引用参数集**：在 Deployment 配置中通过 `store` 块引用参数集，格式为 `store.varset.<STORE_NAME>.<VARIABLE_NAME>`。
 
 详细说明（包括密钥轮转、加密原理、常见问题等）请参考 [参数集保密值使用指南](../../../docs/secret-parameters.md)。
 
